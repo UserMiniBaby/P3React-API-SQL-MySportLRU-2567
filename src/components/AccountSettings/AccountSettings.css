@@ -1,0 +1,93 @@
+.account-settings-container {
+    width: 50%;
+    margin: auto;
+    padding: 20px;
+}
+
+/* หัวข้อ */
+h2 {
+    text-align: left;
+    font-size: 24px; /* ✅ ปรับขนาดให้เหมาะสม */
+    font-weight: bold;
+    color: #000000;
+}
+
+/* ส่วนของแบบฟอร์ม */
+.form-section {
+    margin-top: 20px;
+    padding: 15px;
+}
+
+/* ป้ายกำกับ */
+label {
+    display: block;
+    margin-top: 10px;
+    font-weight: bold;
+    font-size: 16px; /* ✅ ปรับขนาดให้เหมาะสม */
+    color: #555;
+}
+
+/* อินพุต */
+input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px; /* ✅ ปรับขนาดตัวอักษรให้ใหญ่ขึ้น */
+}
+
+/* ปุ่มบันทึก */
+.save-button {
+    margin-top: 20px;
+    width: 100%;
+    padding: 12px;
+    background: #3498db;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 18px; /* ✅ ปรับขนาดให้ใหญ่ขึ้น */
+    font-weight: bold;
+}
+
+.save-button:hover {
+    background: #2980b9;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .account-settings-container {
+        width: 70%; /* ✅ ขยายพื้นที่ให้กว้างขึ้น */
+    }
+
+    h2 {
+        font-size: 22px;
+    }
+
+    label, input {
+        font-size: 15px;
+    }
+
+    .save-button {
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 768px) {
+    .account-settings-container {
+        width: 90%;
+    }
+
+    h2 {
+        font-size: 20px;
+    }
+
+    label, input {
+        font-size: 14px;
+    }
+
+    .save-button {
+        font-size: 14px;
+    }
+}

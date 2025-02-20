@@ -1,0 +1,143 @@
+/* ตั้งค่าพื้นหลัง */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  
+  /* คอนเทนเนอร์หลัก */
+  .login-container {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    background: white;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .bg-img {
+    height: 40%;
+    width: auto;
+  }
+  
+  /* พื้นที่ด้านซ้าย */
+  .login-left {
+    flex: 1;
+    background: #00d0ff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  /* พื้นที่ฟอร์มด้านขวา */
+  .login-right {
+    flex: 1;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  
+  /* หัวข้อ */
+  .login-right h2 {
+    font-size: 26px;
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+  
+  /* ข้อความ Sign up */
+  .login-right p {
+    color: gray;
+    margin-bottom: 15px;
+  }
+  
+  .login-right a {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  
+  /* ฟอร์ม */
+  .login-form {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* ช่องกรอกข้อมูล */
+  .input-box {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 10px;
+    background: #f8f9fa;
+    margin-bottom: 12px;
+  }
+  
+  .input-box i {
+    color: gray;
+    margin-right: 8px;
+  }
+  
+  /* อินพุต */
+  .login-form input {
+    width: 100%;
+    border: none;
+    background: none;
+    outline: none;
+    font-size: 16px;
+  }
+  
+  /* ปุ่ม Login */
+  .login-form button {
+    width: 100%;
+    padding: 12px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 10px;
+  }
+  
+  .login-form button:hover {
+    background: #0056b3;
+  }
+  
+  /* ลิงก์ Forgot Password */
+  .forgot-password {
+    text-align: center;
+    margin-top: 10px;
+    font-size: 14px;
+  }
+  
+  .forgot-password a {
+    color: red;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    .login-container {
+      flex-direction: column;
+      width: 90%;
+      height: auto;
+    }
+  
+    .login-left {
+      display: none;
+    }
+  
+    .login-right {
+      padding: 20px;
+    }
+  }
+  

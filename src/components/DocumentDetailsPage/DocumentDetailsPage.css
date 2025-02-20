@@ -1,0 +1,31 @@
+/* DocumentDetailsPage.css */
+.document-container {
+    margin: 20px;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.document-container h3 {
+    color: #3498db;
+    font-size: 1.5em;
+}
+
+.document-details {
+    font-size: 16px;
+    color: #333;
+}
+
+.confirm-button {
+    background-color: #27ae60;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.confirm-button:hover {
+    background-color: #2ecc71;
+}

@@ -1,0 +1,22 @@
+.layout-container {
+	min-height: 100vh;
+}
+
+.layout-header {
+	padding: 20px;
+	background-color: rgba(216, 216, 216, 0.486);
+}
+
+.layout-sidebar {
+	padding: 20px;
+	width: 250px;
+	min-width: 250px;
+	background-color: rgba(216, 216, 216, 0.486);
+	flex-wrap: nowrap;
+}
+
+.layout-main {
+	padding: 30px;
+	/* display: block; */
+	background-color: rgba(216, 216, 216, 0.486);
+}

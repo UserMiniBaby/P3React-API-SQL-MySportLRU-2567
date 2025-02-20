@@ -1,0 +1,116 @@
+/* ✅ ตั้งค่าพื้นฐาน */
+.status-container {
+    max-width: 900px;
+    margin: 30px auto;
+    padding: 20px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* ✅ ตาราง */
+.status-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.status-table thead {
+    background: #2DA8E2;
+    color: white;
+    font-weight: bold;
+}
+
+.status-table th, .status-table td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+/* ✅ ปุ่มกดยืนยัน */
+.confirm-btn {
+    background: #2DA8E2;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    font-size: 14px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.confirm-btn:hover {
+    background: #2188C4;
+}
+
+/* ✅ สถานะต่าง ๆ */
+.status-badge {
+    display: inline-block;
+    padding: 5px 10px;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 20px;
+    text-align: center;
+}
+
+/* ✅ สีตามสถานะ */
+.status-pending {
+    background: #FFF9C4;
+    color: #A1887F;
+}
+
+.status-approved {
+    background: #FFE0B2;
+    color: #EF6C00;
+}
+
+.status-active {
+    background: #B2EBF2;
+    color: #00796B;
+}
+
+.status-completed {
+    background: #C8E6C9;
+    color: #388E3C;
+}
+
+.status-cancelled {
+    background: #FFCDD2;
+    color: #D32F2F;
+}
+
+/* ✅ ปุ่มเปลี่ยนหน้า */
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    gap: 5px;
+}
+
+.page-btn {
+    background: #ddd;
+    border: none;
+    padding: 8px 12px;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.page-btn:hover {
+    background: #bbb;
+}
+
+/* ✅ ปรับให้ดูดีในมือถือ */
+@media (max-width: 768px) {
+    .status-container {
+        padding: 15px;
+    }
+
+    .status-table th, .status-table td {
+        padding: 10px;
+    }
+}
