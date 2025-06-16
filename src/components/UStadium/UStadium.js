@@ -53,7 +53,7 @@ const UStadium = () => {
                     <div
                         key={item.id}
                         className="sport-card"
-                        onClick={() => navigate(`/booking/${item.name}`)}
+                        onClick={() => navigate(`/booking/${encodeURIComponent(item.name)}?type=${item.type}`)}
                     >
                         <img
                             src={`http://localhost:5000/images/${item.img}`}

@@ -1,6 +1,6 @@
 import React, { useContext, useEffect } from "react";
 import { Outlet, Link } from "react-router-dom";
-import { FaTachometerAlt, FaUser, FaWater, FaHistory, FaSignOutAlt, FaWrench } from "react-icons/fa"; // เพิ่มไอคอน
+import { FaTachometerAlt, FaUser, FaWater, FaAlignLeft, FaSignOutAlt, FaWrench } from "react-icons/fa"; // เพิ่มไอคอน
 import "./AdminLayout.css";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
@@ -17,7 +17,7 @@ function AdminLayout() {
         } else {
             Axios.get("http://localhost:5000/users", {
                 headers: {
-                    Authorization: "Bearer " + localStorage.getItem("token") 
+                    Authorization: "Bearer " + localStorage.getItem("token")
                 }
             }).then((resp) => {
                 if (resp.data.status === "ok") {
@@ -68,27 +68,55 @@ function AdminLayout() {
                                 Dashboard
                             </Link>
                             {user.roles === "Sports" && (
-                                <Link
-                                    to="/dashboard/stadium"
-                                    type="button"
-                                    className="btn btn-outline-primary w-100 mb-2"
-                                >
-                                    <FaUser className="me-2" />
-                                    จัดการพื้นที่กีฬา
-                                </Link>
+                                <>
+                                    <Link
+                                        to="/dashboard/stadium"
+                                        type="button"
+                                        className="btn btn-outline-primary w-100 mb-2"
+                                    >
+                                        <FaUser className="me-2" />
+                                        จัดการพื้นที่กีฬา
+                                    </Link>
+                                    <Link
+                                        to="/dashboard/stadiumreserve"
+                                        type="button"
+                                        className="btn btn-outline-primary w-100 mb-2"
+                                    >
+                                        <FaUser className="me-2" />
+                                        จัดการข้อมูลการจอง
+                                    </Link>
+                                </>
                             )}
                             {user.roles === "Division" && (
-                                <Link
-                                    to="/dashboard/sportequipment"
-                                    type="button"
-                                    className="btn btn-outline-primary w-100 mb-2"
-                                >
-                                    <FaUser className="me-2" />
-                                    จัดการอุปกรณ์กีฬา
-                                </Link>
+                                <>
+                                    <Link
+                                        to="/dashboard/sportequipment"
+                                        type="button"
+                                        className="btn btn-outline-primary w-100 mb-2"
+                                    >
+                                        <FaUser className="me-2" />
+                                        จัดการอุปกรณ์กีฬา
+                                    </Link>
+                                    <Link
+                                        to="/dashboard/sportreduce"
+                                        type="button"
+                                        className="btn btn-outline-primary w-100 mb-2"
+                                    >
+                                        <FaUser className="me-2" />
+                                        การจำหน่ายอุปกรณ์
+                                    </Link>
+                                    <Link
+                                        to="/dashboard/sportborrow"
+                                        type="button"
+                                        className="btn btn-outline-primary w-100 mb-2"
+                                    >
+                                        <FaAlignLeft className="me-2" />
+                                        จัดการข้อมูลยืมคืน
+                                    </Link>
+                                </>
                             )}
                             <Link
-                                to="#"
+                                to="/dashboard/users"
                                 type="button"
                                 className="btn btn-outline-primary w-100 mb-2"
                             >
@@ -96,7 +124,7 @@ function AdminLayout() {
                                 จัดการข้อมูลผู้ดูแลระบบ
                             </Link>
                         </div>
-                        
+
                         <button
                             onClick={onLogout}
                             type="button"

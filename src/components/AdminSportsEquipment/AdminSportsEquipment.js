@@ -15,12 +15,16 @@ function AdminSportsEquipment() {
     const { user } = useContext(AuthContext);
     const [showAdd, setShowAdd] = useState(false);
     const [showEdit, setShowEdit] = useState(false);
+    const [showReduce, setShowReduce] = useState(false);
     const [name, setName] = useState("");
     const [quantity, setQuantity] = useState(0);
     const [selectedImage, setSelectedImage] = useState(null)
     const [equipmentData, setEquipmentData] = useState([]);
     const [editId, setEditId] = useState(null);
+    const [reduceId, setReduceId] = useState(null);
     const [showEditImage, setShowEditImage] = useState("");
+    const [reduceAmount, setReduceAmount] = useState(0);
+    const [reduceNote, setReduceNote] = useState("");
 
     const handleCloseAddModal = () => setShowAdd(false);
     const handleShowAddModal = () => setShowAdd(true);
@@ -50,6 +54,18 @@ function AdminSportsEquipment() {
             })
 
         setShowEdit(true)
+    };
+
+    const handleCloseReduceModal = () => {
+        setShowReduce(false)
+        setReduceId(null);
+        setReduceAmount(0);
+        setReduceNote("");
+    };
+
+    const handleShowReduceModal = (id) => {
+        setReduceId(id);
+        setShowReduce(true)
     };
 
     const getEquipment = () => {
@@ -106,6 +122,48 @@ function AdminSportsEquipment() {
         }
     };
 
+    const submitReduce = () => {
+        console.log(reduceId)
+        if (reduceNote !== "" && reduceAmount !== "") {
+            Axios.put(`http://localhost:5000/sportequipment/reduce/${reduceId}`, {
+                amount: reduceAmount,
+                note: reduceNote,
+            }, {
+                headers: {
+                    "Authorization": "Bearer " + localStorage.getItem("token")
+                },
+            })
+                .then((resp) => {
+                    if (resp.data.status === "ok") {
+                        Swal.fire({
+                            title: 'แจ้งเตือน',
+                            text: 'จำหน่วยอุปกรณ์สำเร็จ',
+                            icon: 'success',
+                            confirmButtonText: 'ตกลง'
+                        })
+                        handleCloseReduceModal()
+                        setReduceAmount("");
+                        setReduceNote(0);
+                        getEquipment();
+                    }
+                })
+                .catch((err) => {
+                    if (err.response.data.message) {
+                        Swal.fire({
+                            title: "แจ้งเตือน",
+                            text: err.response.data.message,
+                            icon: "error",
+                            confirmButtonText: "ตกลง"
+                        });
+                    }
+
+                    console.error("Error saving data:", err);
+                });
+        } else {
+            alert("กรอกข้อมูลให้ครบถ้วน")
+        }
+    };
+
     const submit = () => {
         if (selectedImage && name !== "") {
             const formData = new FormData();
@@ -144,21 +202,21 @@ function AdminSportsEquipment() {
                 Authorization: "Bearer " + localStorage.getItem("token")
             }
         })
-        .then((resp) => {
-            if (resp.data.status === "ok") {
-                Swal.fire({
-                    title: 'เปิดใช้งานอุปกรณ์กีฬาสำเร็จ',
-                    icon: 'success',
-                    confirmButtonText: 'ตกลง'
-                })
-                getEquipment();
-            }
-        })
-        .catch((err) => {
-            if (err.response.data.message) {
-                alert(err.response.data.message)
-            }
-        });
+            .then((resp) => {
+                if (resp.data.status === "ok") {
+                    Swal.fire({
+                        title: 'เปิดใช้งานอุปกรณ์กีฬาสำเร็จ',
+                        icon: 'success',
+                        confirmButtonText: 'ตกลง'
+                    })
+                    getEquipment();
+                }
+            })
+            .catch((err) => {
+                if (err.response.data.message) {
+                    alert(err.response.data.message)
+                }
+            });
     }
 
     const disableStadium = (id) => {
@@ -167,21 +225,21 @@ function AdminSportsEquipment() {
                 Authorization: "Bearer " + localStorage.getItem("token")
             }
         })
-        .then((resp) => {
-            if (resp.data.status === "ok") {
-                Swal.fire({
-                    title: 'ยกเลิกการใช้อุปกรณ์กีฬาสำเร็จ',
-                    icon: 'success',
-                    confirmButtonText: 'ตกลง'
-                })
-                getEquipment();
-            }
-        })
-        .catch((err) => {
-            if (err.response.data.message) {
-                alert(err.response.data.message)
-            }
-        });
+            .then((resp) => {
+                if (resp.data.status === "ok") {
+                    Swal.fire({
+                        title: 'ยกเลิกการใช้อุปกรณ์กีฬาสำเร็จ',
+                        icon: 'success',
+                        confirmButtonText: 'ตกลง'
+                    })
+                    getEquipment();
+                }
+            })
+            .catch((err) => {
+                if (err.response.data.message) {
+                    alert(err.response.data.message)
+                }
+            });
     }
 
     const columns = [
@@ -192,6 +250,12 @@ function AdminSportsEquipment() {
         {
             name: "จำนวน",
             selector: (row) => row.quantity,
+            width: "150px"
+        },
+        {
+            name: "คงเหลือ",
+            selector: (row) => row.available,
+            width: "150px"
         },
         {
             name: "รูป",
@@ -207,12 +271,15 @@ function AdminSportsEquipment() {
             selector: (row) => {
                 return (
                     <div className="btn-group">
+                        <button className="btn btn-dark" onClick={() => handleShowReduceModal(row.sport_id)}>
+                            จำหน่าย
+                        </button>
                         <button className="btn btn-primary" onClick={() => handleShowEditModal(row.sport_id)}>
                             แก้ไข
                         </button>
                         {row.status ? (
                             <button className="btn btn-danger" onClick={() => disableStadium(row.sport_id)}>
-                                ยกเลิกการใช้งาน
+                                ยกเลิก
                             </button>
                         ) : (
                             <button className="btn btn-warning" onClick={() => enableStadium(row.sport_id)}>
@@ -233,7 +300,7 @@ function AdminSportsEquipment() {
 
     useEffect(() => {
         if (user.roles === "External" || user.roles === "Internal") {
-          navigate("/");
+            navigate("/");
         }
     }, [])
 
@@ -349,6 +416,49 @@ function AdminSportsEquipment() {
                         ปิด
                     </Button>
                     <Button variant="primary" onClick={submitEdit}>
+                        ยืนยัน
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
+            {/* Modal จำหน่าย */}
+            <Modal show={showReduce} onHide={handleShowReduceModal}>
+                <Modal.Header closeButton>
+                    <Modal.Title>จำหน่ายอุปกรณ์</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <div className="mb-3">
+                        <label htmlFor="amount">จำนวน</label>
+                        <input
+                            type="number"
+                            className="form-control"
+                            id="amount"
+                            value={reduceAmount}
+                            onChange={(e) =>
+                                setReduceAmount(e.target.value)
+                            }
+                            required
+                        />
+                    </div>
+                    <div className="mb-3">
+                        <label htmlFor="note">ข้อความ</label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            id="note"
+                            value={reduceNote}
+                            onChange={(e) =>
+                                setReduceNote(e.target.value)
+                            }
+                            required
+                        />
+                    </div>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleCloseReduceModal}>
+                        ปิด
+                    </Button>
+                    <Button variant="primary" onClick={submitReduce}>
                         ยืนยัน
                     </Button>
                 </Modal.Footer>

@@ -7,13 +7,21 @@ const conn = require("../config/database");
 router.post("/register", (req, res) => {
     const { first_name, last_name, email, phonenumber, password } = req.body;
 
-    // if (name !== "" && email !== "" && password !== "" && phonenumber !== "") {
-    //     res.status(400).json({
-    //         status: "error",
-    //         message: "กรอกข้อมูลให้ครบถ้วน",
-    //     });
-    //     return;
-    // }
+    if (first_name == "" && last_name == "" && email == "" && password == "") {
+        res.status(400).json({
+            status: "error",
+            message: "กรอกข้อมูลให้ครบถ้วน",
+        });
+        return;
+    }
+
+    if (phonenumber.length != 10) {
+        res.status(400).json({
+            status: "error",
+            message: "เบอร์โทรศัพท์ไม่ถูกต้อง",
+        });
+        return;
+    }
 
     let roles = "External";
 

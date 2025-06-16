@@ -8,7 +8,7 @@ import Axios from "axios"
 const Layout = () => {
 
     const navigate = useNavigate();
-    const { loggedIn, saveUser } = useContext(AuthContext);
+    const { loggedIn, saveUser, logout } = useContext(AuthContext);
 
     useEffect(() => {
         if (!loggedIn) {
@@ -24,7 +24,12 @@ const Layout = () => {
                 }
             }).catch((err) => {
                 if (err.response.data.message) {
-                    alert(err.response.data.message)
+                    if (err.response.status === 401) {
+                        logout();
+                        navigate("/login");
+                    } else {
+                        alert(err.response.data.message)
+                    }
                 }
             })
         }

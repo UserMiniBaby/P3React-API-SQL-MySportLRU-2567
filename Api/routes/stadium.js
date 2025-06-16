@@ -26,9 +26,16 @@ router.get("/", (req, res) => {
             return;
         }
 
-        res.status(200).json({ status: "ok", data: result });
-    })
-})
+        // เพิ่ม type: "stadium" ให้กับแต่ละรายการ
+        const modifiedResult = result.map(item => ({
+            ...item,
+            type: "stadium"
+        }));
+
+        res.status(200).json({ status: "ok", data: modifiedResult });
+    });
+});
+
 
 router.get("/:id", (req, res) => {
     const { id } = req.params;

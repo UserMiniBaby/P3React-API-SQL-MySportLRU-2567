@@ -21,7 +21,7 @@ const Navbar = () => {
             <div className="menu">
                 {user.roles === "Internal" && (
                     <span className="nav-link" onClick={() => navigate("/")}>
-                        อุปกรณ์กีฬา
+                        <Link to="/sports">อุปกรณ์กีฬา</Link>
                     </span>
                 )}
                 <Link to="/sports">พื้นที่กีฬา</Link>

@@ -114,6 +114,7 @@ const Signup = () => {
                 placeholder="Phone Number"
                 value={formData.phone}
                 onChange={handleChange}
+                maxLength={10}
                 required
               />
             </div>

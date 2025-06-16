@@ -17,6 +17,10 @@ import { AuthContext } from "./context/AuthContext";
 import AdminStadium from "./components/AdminStadium/Stadium";
 import UStadium from "./components/UStadium/UStadium";
 import AdminSportsEquipment from "./components/AdminSportsEquipment/AdminSportsEquipment";
+import AdminBorrow from "./components/AdminBorrow/AdminBorrow";
+import AdminUsers from "./components/AdminUsers/AdminUsers";
+import AdminReserve from "./components/AdminReserve/AdminReserve";
+import AdminSportsReduce from "./components/AdminSportsReduce/AdminSportsReduce";
 
 
 
@@ -41,6 +45,11 @@ function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/dashboard/stadium" element={<AdminStadium />} />
             <Route path="/dashboard/sportequipment" element={<AdminSportsEquipment />} />
+            <Route path="/dashboard/sportreduce" element={<AdminSportsReduce />} />
+            <Route path="/dashboard/sportborrow" element={<AdminBorrow />} />
+            <Route path="/dashboard/sportborrow" element={<AdminBorrow />} />
+            <Route path="/dashboard/stadiumreserve" element={<AdminReserve />} />
+            <Route path="/dashboard/users" element={<AdminUsers />} />
           </Route>
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />

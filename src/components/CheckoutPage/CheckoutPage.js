@@ -43,14 +43,38 @@ const ConfirmBorrowPage = () => {
 
     // ✅ ฟังก์ชันยืนยันการยืม
     const handleConfirm = () => {
-        Swal.fire({
-            title: "แจ้งเตือน",
-            text: "ส่งคำขอยืมอุปกรณ์เรียบร้อยแล้ว!",
-            icon: "success",
-            confirmButtonText: "ตกลง"
-        });
-        localStorage.removeItem("cart"); // ✅ ล้างตะกร้าหลังยืนยัน
-        navigate("/status"); // ✅ ไปยังหน้าติดตามสถานะ
+        Axios.post("http://localhost:5000/sportcheckout", {
+            data: cart,
+            firstName: user.first_name,
+            lastName: user.last_name,
+            email: user.email,
+            phoneNumber: user.phonenumber,
+        }, {
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("token")
+            }
+        }).then((resp) => {
+            Swal.fire({
+                title: "แจ้งเตือน",
+                text: "ส่งคำขอเรียบร้อยแล้ว!",
+                icon: "success",
+                confirmButtonText: "ตกลง"
+            });
+            
+            localStorage.removeItem("cart"); // ✅ ล้างตะกร้าหลังยืนยัน
+            navigate("/status"); // ✅ ไปยังหน้าติดตามสถานะ
+        }).catch((err) => {
+            if (err.response.data.message) {
+                Swal.fire({
+                    title: "แจ้งเตือน",
+                    text: err.response.data.message,
+                    icon: "error",
+                    confirmButtonText: "ตกลง"
+                });
+            } 
+
+            console.error("Error saving checkout data:", err);
+        })
     };
 
     return (

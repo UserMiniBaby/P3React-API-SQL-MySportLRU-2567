@@ -27,13 +27,13 @@ h2 {
 
 .status-table th, .status-table td {
     padding: 15px;
-    text-align: left;
+    text-align: center;
     border-bottom: 1px solid #ddd;
 }
 
 /* ✅ ปุ่มกดยืนยัน */
 .confirm-btn {
-    background: #2DA8E2;
+    background: #e22d36;
     color: white;
     border: none;
     padding: 8px 15px;

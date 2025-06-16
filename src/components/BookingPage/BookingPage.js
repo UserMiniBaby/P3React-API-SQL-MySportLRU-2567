@@ -11,6 +11,11 @@ const BookingPage = () => {
     const decodedItemName = decodeURIComponent(itemName);
     const navigate = useNavigate();
 
+    // อ่านและ decode ค่า type จาก query string
+    const queryParams = new URLSearchParams(location.search);
+    const rawType = queryParams.get("type") || "";
+    const decodedType = decodeURIComponent(rawType);
+
     const [selectedDates, setSelectedDates] = useState([]);
     const [quantity, setQuantity] = useState(1);
     const [startTime, setStartTime] = useState("08:30");
@@ -26,14 +31,30 @@ const BookingPage = () => {
     ];
 
     useEffect(() => {
+        setItemImage(null);
+
         Axios.get("http://localhost:5000/sportequipment")
             .then((resp) => {
                 if (resp.data.status === "ok") {
                     const item = resp.data.data.find((equip) => equip.name === decodedItemName);
                     if (item && item.img) {
                         setItemImage(`http://localhost:5000/images/${item.img}`);
-                    } else {
-                        setItemImage(null);
+                    }
+                }
+                setLoading(false);
+            })
+            .catch((err) => {
+                console.error("เกิดข้อผิดพลาดในการโหลดรูปภาพ:", err);
+                setError("ไม่สามารถโหลดรูปได้");
+                setLoading(false);
+            });
+            
+        Axios.get("http://localhost:5000/stadium")
+            .then((resp) => {
+                if (resp.data.status === "ok") {
+                    const item = resp.data.data.find((equip) => equip.name === decodedItemName);
+                    if (item && item.img) {
+                        setItemImage(`http://localhost:5000/images/${item.img}`);
                     }
                 }
                 setLoading(false);
@@ -44,9 +65,12 @@ const BookingPage = () => {
                 setLoading(false);
             });
     }, [decodedItemName]); // ✅ ใช้ useEffect ถูกต้อง
+
     // ✅ ป้องกันการเลือกวันซ้ำ หรือเกิน 5 วัน
     const handleDateSelect = (date) => {
-        const dateString = date.toISOString().split("T")[0];
+        const dateString = date.toLocaleDateString("sv-SE", {
+            timeZone: "Asia/Bangkok"
+        });
         setSelectedDates((prevDates) => {
             if (prevDates.includes(dateString)) {
                 return prevDates.filter((d) => d !== dateString);
@@ -60,7 +84,9 @@ const BookingPage = () => {
     // ✅ กำหนดสีของวันที่ในปฏิทิน
     const tileClassName = ({ date, view }) => {
         if (view === "month") {
-            const dateString = date.toISOString().split("T")[0];
+            const dateString = date.toLocaleDateString("sv-SE", {
+                timeZone: "Asia/Bangkok"
+            });
             const dayOfWeek = date.getDay();
 
             if (selectedDates.includes(dateString)) return "selected-day";
@@ -132,7 +158,7 @@ const BookingPage = () => {
         }
 
         const cartItems = JSON.parse(localStorage.getItem("cart")) || [];
-        const newCartItem = { itemName: decodedItemName, selectedDates, quantity, startTime, endTime };
+        const newCartItem = { itemName: decodedItemName, type: decodedType, selectedDates, quantity, startTime, endTime };
 
         localStorage.setItem("cart", JSON.stringify([...cartItems, newCartItem]));
         navigate("/cart");
@@ -151,7 +177,7 @@ const BookingPage = () => {
         }
 
         const cartItems = JSON.parse(localStorage.getItem("cart")) || [];
-        const newCartItem = { itemName: decodedItemName, selectedDates, quantity, startTime, endTime };
+        const newCartItem = { itemName: decodedItemName, type: decodedType, selectedDates, quantity, startTime, endTime };
 
         localStorage.setItem("cart", JSON.stringify([...cartItems, newCartItem]));
         navigate("/checkout");

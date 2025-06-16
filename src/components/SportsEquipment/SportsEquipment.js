@@ -33,7 +33,7 @@ const SportsEquipment = () => {
     }
 
     const filteredItems = equipmentData.filter(item =>
-        item.name.toLowerCase().includes(search.toLowerCase())
+        item.name.toLowerCase().includes(search.toLowerCase()) && item.status
     );
 
     return (
@@ -56,7 +56,7 @@ const SportsEquipment = () => {
                     <div
                         key={item.id}
                         className="sport-card"
-                        onClick={() => navigate(`/booking/${item.name}`)}
+                        onClick={() => navigate(`/booking/${encodeURIComponent(item.name)}?type=${item.type}`)}
                     >
                         <img
                             src={`http://localhost:5000/images/${item.img}`}
