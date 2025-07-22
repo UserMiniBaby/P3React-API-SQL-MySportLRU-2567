@@ -64,47 +64,43 @@ const Login = () => {
         <img className="bg-img" src="lru.png" alt="Logo" />
       </div>
       <div className="login-right">
-        <h2>Login</h2>
+        <h2>สมัครสมาชิก</h2>
         <p>
-          Do not have an account?{" "}
+          ยังไม้มีบัญชีใช่ไหม?{" "}
           <a href="#" onClick={() => navigate("/signup")}>
-            create a new one.
+            สมัครสมาชิก
           </a>
         </p>
 
         <form onSubmit={handleSubmit} className="login-form">
-          <label>Enter Your Email</label>
+          <label>อีเมล</label>
           <div className="input-box">
             <FaEnvelope />
             <input
               type="email"
               name="email"
-              placeholder="Enter your email"
+              placeholder="อีเมล"
               value={formData.email}
               onChange={handleChange} // ✅ ใช้ handleChange
               required
             />
           </div>
 
-          <label>Enter Your Password</label>
+          <label>รหัสผ่าน</label>
           <div className="input-box">
             <FaLock />
             <input
               type="password"
               name="password"
-              placeholder="Enter your password"
+              placeholder="รหัสผ่าน"
               value={formData.password}
               onChange={handleChange} // ✅ ใช้ handleChange
               required
             />
           </div>
 
-          <button type="submit">Login</button>
+          <button type="submit">เข้าสู่ระบบ</button>
         </form>
-
-        <div className="forgot-password">
-          <a href="#">Forgot Your Password</a>
-        </div>
       </div>
     </div>
   );

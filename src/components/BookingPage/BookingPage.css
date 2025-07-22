@@ -92,16 +92,16 @@ html {
     font-weight: bold;
 }
 
-/* ✅ วันที่เต็ม (ตัวหนังสือสีแดง - ไม่สามารถเลือกได้) */
+/* ✅ วันที่เต็ม (ตัวหนังสือสีแดง - ไม่สามารถเลือกได้)
 .booked-day {
     color: red !important;
     font-weight: bold;
-}
+} */
 
 /* ✅ วันหยุดราชการ / เสาร์อาทิตย์ (ตัวหนังสือสีเทา - ไม่สามารถเลือกได้) */
 .holiday-day,
 .weekend-day {
-    color: gray !important;
+    color: rgb(255, 1, 1) !important;
     font-weight: bold;
 }
 

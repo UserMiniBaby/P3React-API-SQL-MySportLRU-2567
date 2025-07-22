@@ -1,9 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import "./StatusPage.css";
 import Axios from "axios";
-import Swal from 'sweetalert2'
+import Swal from 'sweetalert2';
+import { PDFDocument, rgb } from 'pdf-lib';
+import * as fontkit from 'fontkit';
+import { AuthContext } from "../../context/AuthContext";
 
 const StatusPage = () => {
+    const { user } = useContext(AuthContext);
     const [bookings, setBookings] = useState([]);
 
     const getData = () => {
@@ -22,6 +26,187 @@ const StatusPage = () => {
             });
     }
 
+    function wrapText(text, maxCharsPerLine) {
+        const lines = [];
+        let currentLine = "";
+
+        text.split(" ").forEach(word => {
+            // ถ้าคำเดียวยาวเกิน maxCharsPerLine → ตัดกลางคำเลย
+            while (word.length > maxCharsPerLine) {
+                if (currentLine) {
+                    lines.push(currentLine);
+                    currentLine = "";
+                }
+                lines.push(word.slice(0, maxCharsPerLine));
+                word = word.slice(maxCharsPerLine);
+            }
+
+            // กรณีเติมคำต่อท้ายบรรทัด
+            if ((currentLine + (currentLine ? " " : "") + word).length <= maxCharsPerLine) {
+                currentLine += (currentLine ? " " : "") + word;
+            } else {
+                if (currentLine) lines.push(currentLine);
+                currentLine = word;
+            }
+        });
+
+        if (currentLine) {
+            lines.push(currentLine);
+        }
+
+        return lines;
+    }
+
+    const openFiles = async (type, id, items, startDate, endDate, agency, objective) => {
+        const existingPdfBytes = await fetch("http://localhost:5000/files/sport-form.pdf").then(res => res.arrayBuffer());
+
+        // โหลดฟอนต์ TTF ภาษาไทย
+        const fontBytes = await fetch('/fonts/Sarabun-Regular.ttf').then(res => res.arrayBuffer());
+
+        const pdfDoc = await PDFDocument.load(existingPdfBytes);
+        const pages = pdfDoc.getPages();
+        const firstPage = pages[0];
+
+        // ขนาดหน้ากระดาษ
+        const { width, height } = firstPage.getSize();
+
+        pdfDoc.registerFontkit(fontkit);
+
+        // ฝังฟอนต์
+        const customFont = await pdfDoc.embedFont(fontBytes);
+
+        // ชื่อ นามสกุล
+        firstPage.drawText(`${user.first_name} ${user.last_name}`, {
+            x: 165, // ระยะจากซ้าย
+            y: height - 150, // ระยะจากล่าง (จากบน = height - y)
+            size: 8,
+            font: customFont,
+            color: rgb(0, 0, 0),
+        });
+
+        // ตำแหน่ง
+        firstPage.drawText(user.position || "", {
+            x: 345, // ระยะจากซ้าย
+            y: height - 150, // ระยะจากล่าง (จากบน = height - y)
+            size: 8,
+            font: customFont,
+            color: rgb(0, 0, 0),
+        });
+
+        // หน่วยงาน
+        firstPage.drawText(agency, {
+            x: 125, // ระยะจากซ้าย
+            y: height - 178, // ระยะจากล่าง (จากบน = height - y)
+            size: 8,
+            font: customFont,
+            color: rgb(0, 0, 0),
+        });
+
+        const objectiveLines = wrapText(objective, 50); // หรือปรับตามความยาวข้อความที่เหมาะสม
+        let objectiveY = height - 206;
+
+        // วัตถุประสงค์
+        objectiveLines.forEach((line, index) => {
+            const lineX = index === 0 ? 252 : 95; // แถวแรกอยู่ที่ 252, ถัดไปอยู่ที่ 210
+
+            firstPage.drawText(line, {
+                x: lineX,
+                y: objectiveY,
+                size: 8,
+                font: customFont,
+                color: rgb(0, 0, 0),
+            });
+
+            objectiveY -= 18; // ระยะห่างระหว่างบรรทัด
+        });
+
+
+        firstPage.drawText(`${user.first_name} ${user.last_name}`, {
+            x: 95, // ระยะจากซ้าย
+            y: height - 534, // ระยะจากล่าง (จากบน = height - y)
+            size: 8,
+            font: customFont,
+            color: rgb(0, 0, 0),
+        });
+
+        // เบอร์โทรศัพท์
+        firstPage.drawText(user.phonenumber, {
+            x: 375, // ระยะจากซ้าย
+            y: height - 179, // ระยะจากล่าง (จากบน = height - y)
+            size: 8,
+            font: customFont,
+            color: rgb(0, 0, 0),
+        });
+
+        // เลขที่ใบยืม
+        firstPage.drawText(id.toString(), {
+            x: 525, // ระยะจากซ้าย
+            y: height - 35, // ระยะจากล่าง (จากบน = height - y)
+            size: 8,
+            font: customFont,
+            color: rgb(0, 0, 0),
+        });
+
+        // แสดงรายการ items
+        let startY = height - 305; // จุดเริ่มต้นของข้อมูล (แนวตั้ง)
+        let startYQuantity = height - 305; // จุดเริ่มต้นของข้อมูล (แนวตั้ง)
+        const lineHeight = 18; // ระยะห่างระหว่างบรรทัด
+
+        items.forEach((item, index) => {
+            firstPage.drawText(item.name, {
+                x: 205,
+                y: startY,
+                size: 8,
+                font: customFont,
+                color: rgb(0, 0, 0),
+            });
+
+            startY -= lineHeight;
+        });
+
+        if (type === "sport") {
+            items.forEach((item, index) => {
+                firstPage.drawText(String(item.quantity), {
+                    x: 350,
+                    y: startYQuantity,
+                    size: 8,
+                    font: customFont,
+                    color: rgb(0, 0, 0),
+                });
+
+                startYQuantity -= lineHeight;
+            });
+
+            // วันที่ยืม
+            firstPage.drawText(`วันยืม/คืน ${formattedDateTime(startDate)} - ${formattedDateTime(endDate)}`, {
+                x: 85, // ระยะจากซ้าย
+                y: height - 480, // ระยะจากล่าง (จากบน = height - y)
+                size: 8,
+                font: customFont,
+                color: rgb(0, 0, 0),
+            });
+        } else {
+            // วันใช้งาน
+            firstPage.drawText(`วันใช้งาน ${formattedDateTime(startDate)} - ${formattedDateTime(endDate)}`, {
+                x: 85, // ระยะจากซ้าย
+                y: height - 480, // ระยะจากล่าง (จากบน = height - y)
+                size: 8,
+                font: customFont,
+                color: rgb(0, 0, 0),
+            });
+        }
+
+        // สร้าง PDF ใหม่
+        const pdfBytes = await pdfDoc.save();
+
+        // ดาวน์โหลดไฟล์
+        const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+
+        window.open(url)
+
+    }
+
     useEffect(() => {
         // ✅ ดึงข้อมูลการจองจาก localStorage หรือ API (สำหรับตอนนี้ใช้ mock data)
         // const storedBookings = JSON.parse(localStorage.getItem("bookings")) || [
@@ -33,6 +218,7 @@ const StatusPage = () => {
         // ];
         // setBookings(storedBookings);
         getData();
+        console.log(user)
     }, []);
 
     // ✅ กำหนดสีตามสถานะ
@@ -125,14 +311,31 @@ const StatusPage = () => {
                     {bookings.map((booking, index) => (
                         <tr key={index}>
                             <td>
-                                <a
-                                    target="_blank"
-                                    href={`http://localhost:5000/files/${booking.type === "stadium" ? "stadium.pdf" : "sport-form.pdf"}`}
-                                    className="fw-bold text-danger text-decoration-underline"
-                                >
-                                    {booking.type === "stadium" ? "ตัวอย่าง" : "แบบฟอร์ม"}
-                                </a>
-
+                                {booking.type === "stadium" ? (
+                                    <>
+                                        <a
+                                            style={{ cursor: "pointer" }}
+                                            className="fw-bold text-danger text-decoration-underline"
+                                            onClick={() => window.open("http://localhost:5000/files/stadium.pdf")}
+                                        >
+                                            ตัวอย่าง
+                                        </a>
+                                        <a
+                                            style={{ cursor: "pointer", marginLeft: "5px" }}
+                                            className="fw-bold text-danger text-decoration-underline"
+                                            onClick={() => openFiles(booking.type, booking.sdocument_id, booking.items, booking.start, booking.end, booking.agency, booking.objective)}
+                                        >
+                                            แบบฟอร์ม
+                                        </a></>
+                                ) : (
+                                    <a
+                                        style={{ cursor: "pointer" }}
+                                        className="fw-bold text-danger text-decoration-underline"
+                                        onClick={() => openFiles(booking.type, booking.document_id, booking.items, booking.start, booking.end, booking.agency, booking.objective)}
+                                    >
+                                        แบบฟอร์ม
+                                    </a>
+                                )}
                             </td>
                             <td>{formattedDateTime(booking.start)} - {formattedDateTime(booking.end)}</td>
                             <td>

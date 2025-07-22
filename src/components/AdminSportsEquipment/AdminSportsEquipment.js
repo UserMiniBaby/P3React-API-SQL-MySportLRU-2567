@@ -16,15 +16,22 @@ function AdminSportsEquipment() {
     const [showAdd, setShowAdd] = useState(false);
     const [showEdit, setShowEdit] = useState(false);
     const [showReduce, setShowReduce] = useState(false);
+    const [showRecive, setShowRecive] = useState(false);
     const [name, setName] = useState("");
     const [quantity, setQuantity] = useState(0);
     const [selectedImage, setSelectedImage] = useState(null)
     const [equipmentData, setEquipmentData] = useState([]);
     const [editId, setEditId] = useState(null);
     const [reduceId, setReduceId] = useState(null);
+    const [reciveId, setReciveId] = useState(null);
     const [showEditImage, setShowEditImage] = useState("");
     const [reduceAmount, setReduceAmount] = useState(0);
     const [reduceNote, setReduceNote] = useState("");
+    const [reciveAmount, setReciveAmount] = useState(0);
+    const [reciveNote, setReciveNote] = useState("");
+
+    const [searchQuery, setSearchQuery] = useState("");
+    const [filteredData, setFilteredData] = useState([]);
 
     const handleCloseAddModal = () => setShowAdd(false);
     const handleShowAddModal = () => setShowAdd(true);
@@ -63,9 +70,21 @@ function AdminSportsEquipment() {
         setReduceNote("");
     };
 
+    const handleCloseReciveModal = () => {
+        setShowRecive(false)
+        setReciveId(null);
+        setReciveAmount(0);
+        setReciveNote("");
+    };
+
     const handleShowReduceModal = (id) => {
         setReduceId(id);
         setShowReduce(true)
+    };
+
+    const handleShowReciveModal = (id) => {
+        setReciveId(id);
+        setShowRecive(true)
     };
 
     const getEquipment = () => {
@@ -73,6 +92,7 @@ function AdminSportsEquipment() {
             .then((resp) => {
                 if (resp.data.status === "ok") {
                     setEquipmentData(resp.data.data)
+                    setFilteredData(resp.data.data);
                 }
             })
             .catch((err) => {
@@ -83,13 +103,12 @@ function AdminSportsEquipment() {
     }
 
     const submitEdit = () => {
-        if (name !== "" && quantity !== "") {
+        if (name !== "") {
             const formData = new FormData();
             if (selectedImage) {
                 formData.append("img", selectedImage);
             }
             formData.append("name", name);
-            formData.append("quantity", quantity);
 
             Axios.put(`http://localhost:5000/sportequipment/edit/${editId}`, formData, {
                 headers: {
@@ -108,11 +127,11 @@ function AdminSportsEquipment() {
                         handleCloseEditModal()
                         setSelectedImage(null);
                         setName("");
-                        setQuantity(0);
                         getEquipment();
                     }
                 })
                 .catch((err) => {
+                    console.log(err);
                     if (err.response.data.message) {
                         alert(err.response.data.message)
                     }
@@ -164,12 +183,52 @@ function AdminSportsEquipment() {
         }
     };
 
+    const submitRecive = () => {
+        if (reciveNote !== "" && reciveNote !== "") {
+            Axios.put(`http://localhost:5000/sportequipment/recive/${reciveId}`, {
+                amount: reciveAmount,
+                note: reciveNote,
+            }, {
+                headers: {
+                    "Authorization": "Bearer " + localStorage.getItem("token")
+                },
+            })
+                .then((resp) => {
+                    if (resp.data.status === "ok") {
+                        Swal.fire({
+                            title: 'แจ้งเตือน',
+                            text: 'รับอุปกรณ์สำเร็จ',
+                            icon: 'success',
+                            confirmButtonText: 'ตกลง'
+                        })
+                        handleCloseReciveModal()
+                        setReciveNote("");
+                        setReciveAmount(0);
+                        getEquipment();
+                    }
+                })
+                .catch((err) => {
+                    if (err.response.data.message) {
+                        Swal.fire({
+                            title: "แจ้งเตือน",
+                            text: err.response.data.message,
+                            icon: "error",
+                            confirmButtonText: "ตกลง"
+                        });
+                    }
+
+                    console.error("Error saving data:", err);
+                });
+        } else {
+            alert("กรอกข้อมูลให้ครบถ้วน")
+        }
+    };
+
     const submit = () => {
         if (selectedImage && name !== "") {
             const formData = new FormData();
             formData.append("img", selectedImage);
             formData.append("name", name);
-            formData.append("quantity", quantity);
 
             Axios.post("http://localhost:5000/sportequipment/add", formData, {
                 headers: {
@@ -182,7 +241,6 @@ function AdminSportsEquipment() {
                         handleCloseAddModal()
                         setSelectedImage(null);
                         setName("");
-                        setQuantity(0);
                         getEquipment();
                     }
                 })
@@ -246,16 +304,19 @@ function AdminSportsEquipment() {
         {
             name: "ชื่อ",
             selector: (row) => row.name,
+            sortable: true,
         },
         {
             name: "จำนวน",
             selector: (row) => row.quantity,
-            width: "150px"
+            width: "150px",
+            sortable: true,
         },
         {
             name: "คงเหลือ",
             selector: (row) => row.available,
-            width: "150px"
+            width: "150px",
+            sortable: true,
         },
         {
             name: "รูป",
@@ -271,6 +332,9 @@ function AdminSportsEquipment() {
             selector: (row) => {
                 return (
                     <div className="btn-group">
+                        <button className="btn btn-light" onClick={() => handleShowReciveModal(row.sport_id)}>
+                            รับ
+                        </button>
                         <button className="btn btn-dark" onClick={() => handleShowReduceModal(row.sport_id)}>
                             จำหน่าย
                         </button>
@@ -293,6 +357,13 @@ function AdminSportsEquipment() {
     ];
 
     useEffect(() => {
+        const filtered = equipmentData.filter((data) =>
+            data.name.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+        setFilteredData(filtered);
+    }, [searchQuery, equipmentData]);
+
+    useEffect(() => {
         getEquipment()
     }, [])
 
@@ -308,17 +379,27 @@ function AdminSportsEquipment() {
         <>
             <div className="d-flex justify-content-between">
                 <h4 className="fw-bold">จัดการอุปกรณ์กีฬา</h4>
-                <button className="btn btn-primary" onClick={handleShowAddModal}>
-                    <FaPlus /> เพิ่มอุปกรณ์กีฬา
-                </button>
+                <div className="d-flex">
+                    <input
+                        type="text"
+                        className="form-control"
+                        placeholder="ค้นหา"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        style={{ width: "300px" }}
+                    />
+                    <button className="btn btn-primary" onClick={handleShowAddModal}>
+                        <FaPlus /> เพิ่มอุปกรณ์กีฬา
+                    </button>
+                </div>
             </div>
             <hr />
-            <DataTable columns={columns} data={equipmentData} pagination />
+            <DataTable columns={columns} data={filteredData} pagination />
 
             {/* Modal เพิ่ม */}
             <Modal show={showAdd} onHide={handleCloseAddModal}>
                 <Modal.Header closeButton>
-                    <Modal.Title>เพิ่มพื้นที่กีฬา</Modal.Title>
+                    <Modal.Title>เพิ่มอุปกรณ์กีฬา</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <div className="mb-3">
@@ -329,18 +410,6 @@ function AdminSportsEquipment() {
                             id="name"
                             onChange={(e) =>
                                 setName(e.target.value)
-                            }
-                            required
-                        />
-                    </div>
-                    <div className="mb-3">
-                        <label htmlFor="username">จำนวน</label>
-                        <input
-                            type="number"
-                            className="form-control"
-                            id="quantity"
-                            onChange={(e) =>
-                                setQuantity(e.target.value)
                             }
                             required
                         />
@@ -371,7 +440,7 @@ function AdminSportsEquipment() {
             {/* Modal แก้ไข */}
             <Modal show={showEdit} onHide={handleCloseEditModal}>
                 <Modal.Header closeButton>
-                    <Modal.Title>แก้ไขพื้นที่กีฬา</Modal.Title>
+                    <Modal.Title>แก้ไขอุปกรณ์กีฬา</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <div className="mb-3">
@@ -383,19 +452,6 @@ function AdminSportsEquipment() {
                             value={name}
                             onChange={(e) =>
                                 setName(e.target.value)
-                            }
-                            required
-                        />
-                    </div>
-                    <div className="mb-3">
-                        <label htmlFor="username">จำนวน</label>
-                        <input
-                            type="number"
-                            className="form-control"
-                            id="quantity"
-                            value={quantity}
-                            onChange={(e) =>
-                                setQuantity(e.target.value)
                             }
                             required
                         />
@@ -422,7 +478,7 @@ function AdminSportsEquipment() {
             </Modal>
 
             {/* Modal จำหน่าย */}
-            <Modal show={showReduce} onHide={handleShowReduceModal}>
+            <Modal show={showReduce} onHide={handleCloseReduceModal}>
                 <Modal.Header closeButton>
                     <Modal.Title>จำหน่ายอุปกรณ์</Modal.Title>
                 </Modal.Header>
@@ -459,6 +515,49 @@ function AdminSportsEquipment() {
                         ปิด
                     </Button>
                     <Button variant="primary" onClick={submitReduce}>
+                        ยืนยัน
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
+            {/* Modal รับอุปกรณ์ */}
+            <Modal show={showRecive} onHide={handleCloseReciveModal}>
+                <Modal.Header closeButton>
+                    <Modal.Title>รับอุปกรณ์</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <div className="mb-3">
+                        <label htmlFor="amount">จำนวน</label>
+                        <input
+                            type="number"
+                            className="form-control"
+                            id="amount"
+                            value={reciveAmount}
+                            onChange={(e) =>
+                                setReciveAmount(e.target.value)
+                            }
+                            required
+                        />
+                    </div>
+                    <div className="mb-3">
+                        <label htmlFor="note">ข้อความ</label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            id="note"
+                            value={reciveNote}
+                            onChange={(e) =>
+                                setReciveNote(e.target.value)
+                            }
+                            required
+                        />
+                    </div>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleCloseReciveModal}>
+                        ปิด
+                    </Button>
+                    <Button variant="primary" onClick={submitRecive}>
                         ยืนยัน
                     </Button>
                 </Modal.Footer>

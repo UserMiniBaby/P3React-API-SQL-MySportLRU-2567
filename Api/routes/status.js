@@ -14,7 +14,7 @@ router.get("/", auth, async (req, res) => {
 
         for (const data of resultsSport) {
             const [details] = await conn.promise().execute(
-                "SELECT * FROM borrowingdetails WHERE document_id = ?",
+                "SELECT bd.*, eq.name FROM borrowingdetails AS bd LEFT JOIN equipment AS eq ON bd.sport_id = eq.sport_id WHERE document_id = ?",
                 [data.document_id]
             );
 
@@ -43,7 +43,7 @@ router.get("/", auth, async (req, res) => {
 
         for (const data of resultsStadium) {
             const [details] = await conn.promise().execute(
-                "SELECT reserve_date AS borrow_date, reserve_end AS return_date FROM stadiumreservationdetail WHERE sdocument_id = ?",
+                "SELECT sr.reserve_date AS borrow_date, sr.reserve_end AS return_date, sd.name FROM stadiumreservationdetail AS sr LEFT JOIN stadium AS sd ON sr.stadium_id = sd.stadium_id WHERE sdocument_id = ?",
                 [data.sdocument_id]
             );
 

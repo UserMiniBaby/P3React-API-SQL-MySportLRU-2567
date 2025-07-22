@@ -100,32 +100,32 @@ const AccountSettings = () => {
         <div className="account-settings-container">
             <h2>Account Settings</h2>
             <div className="form-section">
-                <h3>ข้อมูลโปรไฟล์</h3>
-                <label>First Name</label>
+                <h3>ข้อมูลส่วนตัว</h3>
+                <label>ชื่อจริง</label>
                 <input 
                     type="text" 
                     value={first_name} 
                     onChange={(e) => setFirst_Name(e.target.value)} 
                 />
-                <label>Last Name</label>
+                <label>นามสกุล</label>
                 <input 
                     type="text" 
                     value={last_name} 
                     onChange={(e) => setLast_Name(e.target.value)} 
                 />
-                <label>Phone Number</label>
+                <label>เบอร์โทรศัพท์</label>
                 <input 
                     type="text" 
                     value={phoneNumber} 
                     onChange={(e) => setPhoneNumber(e.target.value)} 
                 />
-                <label>Password</label>
+                <label>รหัสผ่าน</label>
                 <input 
                     type="password" 
                     value={password} 
                     onChange={(e) => setPassword(e.target.value)} 
                 />
-                <label>Confirm Password</label>
+                <label>ยืนยันรหัสผ่าน</label>
                 <input 
                     type="password" 
                     value={conPassword} 

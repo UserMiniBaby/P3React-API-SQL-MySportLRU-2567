@@ -5,7 +5,9 @@ import "./AdminLayout.css";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import Axios from "axios"
-
+import { IoIosBasketball } from "react-icons/io";
+import { HiArchiveBoxXMark } from "react-icons/hi2";
+import { IoIosJournal } from "react-icons/io";
 function AdminLayout() {
 
     const navigate = useNavigate();
@@ -59,7 +61,7 @@ function AdminLayout() {
                 <section className="d-flex flex-fill">
                     <aside className="layout-sidebar d-flex flex-column justify-content-between">
                         <div>
-                            <Link
+                        <div className="mb-2 fw-bold">{user.first_name + " " + user.last_name}</div>                            <Link
                                 to="/dashboard"
                                 type="button"
                                 className="btn btn-outline-primary w-100 mb-2"
@@ -82,7 +84,7 @@ function AdminLayout() {
                                         type="button"
                                         className="btn btn-outline-primary w-100 mb-2"
                                     >
-                                        <FaUser className="me-2" />
+                                        <IoIosJournal className="me-2" />
                                         จัดการข้อมูลการจอง
                                     </Link>
                                 </>
@@ -98,12 +100,20 @@ function AdminLayout() {
                                         จัดการอุปกรณ์กีฬา
                                     </Link>
                                     <Link
+                                        to="/dashboard/sportrecive"
+                                        type="button"
+                                        className="btn btn-outline-primary w-100 mb-2"
+                                    >
+                                        <IoIosBasketball className="me-2" />
+                                        รายงานรับอุปกรณ์
+                                    </Link>
+                                    <Link
                                         to="/dashboard/sportreduce"
                                         type="button"
                                         className="btn btn-outline-primary w-100 mb-2"
                                     >
-                                        <FaUser className="me-2" />
-                                        การจำหน่ายอุปกรณ์
+                                        <HiArchiveBoxXMark className="me-2" />
+                                        รายงานจำหน่ายอุปกรณ์
                                     </Link>
                                     <Link
                                         to="/dashboard/sportborrow"
@@ -121,7 +131,7 @@ function AdminLayout() {
                                 className="btn btn-outline-primary w-100 mb-2"
                             >
                                 <FaWrench className="me-2" />
-                                จัดการข้อมูลผู้ดูแลระบบ
+                                จัดการข้อมูลผู้ใช้งาน
                             </Link>
                         </div>
 

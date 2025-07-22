@@ -13,7 +13,20 @@ const executeQuery = (sql, params) => {
 };
 
 router.post("/", auth, async (req, res) => {
-    const { data, firstName, lastName, email, phoneNumber } = req.body;
+    const { data, firstName, lastName, email, phoneNumber, agency, objective } = req.body;
+
+    function generateCodeWithDate() {
+        const now = new Date();
+        const yy = String(now.getFullYear()).slice(-2); // ปี 2 หลัก
+        const mm = String(now.getMonth() + 1).padStart(2, '0'); // เดือน
+        const dd = String(now.getDate()).padStart(2, '0'); // วัน
+
+        const datePart = dd + mm + yy; // YYMMDD (6 หลัก)
+
+        const randomPart = Math.floor(1000 + Math.random() * 9000); // 4 หลักสุ่ม
+
+        return datePart + randomPart;
+    }
 
     try {
         // ตรวจสอบทั้งหมดก่อนการ insert
@@ -116,12 +129,14 @@ router.post("/", auth, async (req, res) => {
                 const sportEquipmentId = sportResult.sport_id;
 
                 if (!sportDocId) {
+                    const insertId = generateCodeWithDate();
                     const results = await executeQuery(
-                        `INSERT INTO borrowingdocuments (first_name, last_name, phonenumber, email, user_id) 
-                         VALUES (?, ?, ?, ?, (SELECT user_id FROM user WHERE email = ?))`,
-                        [firstName, lastName, phoneNumber, email, email]
+                        `INSERT INTO borrowingdocuments (document_id, first_name, last_name, phonenumber, email, user_id, agency, objective) 
+                         VALUES (?, ?, ?, ?, ?, (SELECT user_id FROM user WHERE email = ?), ?, ?)`,
+                        [insertId, firstName, lastName, phoneNumber, email, email, agency, objective]
                     );
-                    sportDocId = results.insertId;
+                    
+                    sportDocId = insertId;
                 }
 
                 await executeQuery(
@@ -138,12 +153,13 @@ router.post("/", auth, async (req, res) => {
                 const stadiumDbId = stadiumResult.stadium_id;
 
                 if (!stadiumDocId) {
+                    const insertId = generateCodeWithDate();
                     const results = await executeQuery(
-                        `INSERT INTO stadiumdocuments (first_name, last_name, phonenumber, email, user_id) 
-                         VALUES (?, ?, ?, ?, (SELECT user_id FROM user WHERE email = ?))`,
-                        [firstName, lastName, phoneNumber, email, email]
+                        `INSERT INTO stadiumdocuments (sdocument_id, first_name, last_name, phonenumber, email, user_id, agency, objective) 
+                         VALUES (?, ?, ?, ?, ?, (SELECT user_id FROM user WHERE email = ?), ?, ?)`,
+                        [insertId, firstName, lastName, phoneNumber, email, email, agency, objective]
                     );
-                    stadiumDocId = results.insertId;
+                    stadiumDocId = insertId;
                 }
 
                 await executeQuery(

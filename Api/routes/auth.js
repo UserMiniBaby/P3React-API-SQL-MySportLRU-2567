@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken");
 const conn = require("../config/database");
 
 router.post("/register", (req, res) => {
-    const { first_name, last_name, email, phonenumber, password } = req.body;
+    const { first_name, last_name, email, phonenumber, position, password } = req.body;
 
     if (first_name == "" && last_name == "" && email == "" && password == "") {
         res.status(400).json({
@@ -51,8 +51,8 @@ router.post("/register", (req, res) => {
                 return;
             }
             conn.execute(
-                "INSERT INTO user (first_name, last_name, password, phonenumber, roles, email) VALUES (?, ?, ?, ?, ?, ?)",
-                [first_name, last_name, password, phonenumber, roles, email],
+                "INSERT INTO user (first_name, last_name, password, phonenumber, roles, email, position) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                [first_name, last_name, password, phonenumber, roles, email, position],
                 function (err, results, fields) {
                     if (err) {
                         res.status(400).json({

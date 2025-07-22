@@ -21,6 +21,9 @@ function Stadium() {
     const [editId, setEditId] = useState(null);
     const [showEditImage, setShowEditImage] = useState("");
 
+    const [searchQuery, setSearchQuery] = useState("");
+    const [filteredData, setFilteredData] = useState([]);
+
     const handleCloseAddModal = () => setShowAdd(false);
     const handleShowAddModal = () => setShowAdd(true);
 
@@ -55,6 +58,7 @@ function Stadium() {
             .then((resp) => {
                 if (resp.data.status === "ok") {
                     setStadiumData(resp.data.data)
+                    setFilteredData(resp.data.data);
                 }
             })
             .catch((err) => {
@@ -138,21 +142,21 @@ function Stadium() {
                 Authorization: "Bearer " + localStorage.getItem("token")
             }
         })
-        .then((resp) => {
-            if (resp.data.status === "ok") {
-                Swal.fire({
-                    title: 'เปิดใช้งานพื้นที่กีฬาสำเร็จ',
-                    icon: 'success',
-                    confirmButtonText: 'ตกลง'
-                })
-                getStadiumData();
-            }
-        })
-        .catch((err) => {
-            if (err.response.data.message) {
-                alert(err.response.data.message)
-            }
-        });
+            .then((resp) => {
+                if (resp.data.status === "ok") {
+                    Swal.fire({
+                        title: 'เปิดใช้งานพื้นที่กีฬาสำเร็จ',
+                        icon: 'success',
+                        confirmButtonText: 'ตกลง'
+                    })
+                    getStadiumData();
+                }
+            })
+            .catch((err) => {
+                if (err.response.data.message) {
+                    alert(err.response.data.message)
+                }
+            });
     }
 
     const disableStadium = (id) => {
@@ -161,21 +165,21 @@ function Stadium() {
                 Authorization: "Bearer " + localStorage.getItem("token")
             }
         })
-        .then((resp) => {
-            if (resp.data.status === "ok") {
-                Swal.fire({
-                    title: 'ยกเลิกการใช้งานพื้นที่กีฬาสำเร็จ',
-                    icon: 'success',
-                    confirmButtonText: 'ตกลง'
-                })
-                getStadiumData();
-            }
-        })
-        .catch((err) => {
-            if (err.response.data.message) {
-                alert(err.response.data.message)
-            }
-        });
+            .then((resp) => {
+                if (resp.data.status === "ok") {
+                    Swal.fire({
+                        title: 'ยกเลิกการใช้งานพื้นที่กีฬาสำเร็จ',
+                        icon: 'success',
+                        confirmButtonText: 'ตกลง'
+                    })
+                    getStadiumData();
+                }
+            })
+            .catch((err) => {
+                if (err.response.data.message) {
+                    alert(err.response.data.message)
+                }
+            });
     }
 
     const columns = [
@@ -215,6 +219,14 @@ function Stadium() {
         },
     ];
 
+    // ฟังก์ชันกรองข้อมูลตามคำค้น
+    useEffect(() => {
+        const filtered = stadiumData.filter((data) =>
+            data.name.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+        setFilteredData(filtered);
+    }, [searchQuery, stadiumData]);
+
     useEffect(() => {
         getStadiumData()
     }, [])
@@ -231,12 +243,22 @@ function Stadium() {
         <>
             <div className="d-flex justify-content-between">
                 <h4 className="fw-bold">จัดการพื้นที่กีฬา</h4>
-                <button className="btn btn-primary" onClick={handleShowAddModal}>
-                    <FaPlus /> เพิ่มพื้นที่กีฬา
-                </button>
+                <div className="d-flex">
+                    <input
+                        type="text"
+                        className="form-control"
+                        placeholder="ค้นหา"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        style={{ width: "300px" }}
+                    />
+                    <button className="btn btn-primary" onClick={handleShowAddModal}>
+                        <FaPlus /> เพิ่มพื้นที่กีฬา
+                    </button>
+                </div>
             </div>
             <hr />
-            <DataTable columns={columns} data={stadiumData} pagination />
+            <DataTable columns={columns} data={filteredData} pagination />
 
             {/* Modal เพิ่ม */}
             <Modal show={showAdd} onHide={handleCloseAddModal}>

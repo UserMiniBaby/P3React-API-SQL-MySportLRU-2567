@@ -7,6 +7,7 @@ const CartPage = () => {
     const navigate = useNavigate();
     const [cart, setCart] = useState([]);
     const [equipmentData, setEquipmentData] = useState([]); // ✅ เก็บข้อมูลอุปกรณ์จาก API
+    const [stadiumData, setStadiumData] = useState([]);
 
     useEffect(() => {
         // ✅ ดึงรายการอุปกรณ์ทั้งหมดจาก API
@@ -14,6 +15,16 @@ const CartPage = () => {
             .then((resp) => {
                 if (resp.data.status === "ok") {
                     setEquipmentData(resp.data.data);
+                }
+            })
+            .catch((err) => {
+                console.error("เกิดข้อผิดพลาดในการโหลดข้อมูลอุปกรณ์:", err);
+            });
+
+        Axios.get("http://localhost:5000/stadium")
+            .then((resp) => {
+                if (resp.data.status === "ok") {
+                    setStadiumData(resp.data.data);
                 }
             })
             .catch((err) => {
@@ -73,7 +84,11 @@ const CartPage = () => {
                     <tbody>
                         {cart.map((item, index) => {
                             // ✅ ค้นหารูปของ item จาก API
-                            const foundItem = equipmentData.find((equip) => equip.name === item.itemName);
+                            const foundItemEquipment = equipmentData.find((data) => data.name === item.itemName);
+                            const foundItemStadium = stadiumData.find((data) => data.name === item.itemName);
+
+                            const foundItem = foundItemEquipment || foundItemStadium;
+                            console.log(foundItem)
                             const imageUrl = foundItem ? `http://localhost:5000/images/${foundItem.img}` : "https://via.placeholder.com/40";
 
                             return (
@@ -101,7 +116,7 @@ const CartPage = () => {
 
             {cart.length > 0 && (
                 <button onClick={() => navigate("/checkoutpage")} className="checkout-button">
-                    ดำเนินการจองสนาม
+                    ดำเนินการต่อ
                 </button>
             )}
         </div>

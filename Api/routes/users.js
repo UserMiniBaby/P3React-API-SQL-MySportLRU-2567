@@ -32,7 +32,7 @@ router.get("/", auth, (req, res) => {
 
 router.get("/all", auth, (req, res) => {
     conn.execute(
-        "SELECT user_id, first_name, last_name, phonenumber, roles, email FROM user WHERE NOT roles = 'External'",
+        "SELECT user_id, first_name, last_name, phonenumber, roles, email FROM user",
         function (err, results, fields) {
             if (err) {
                 res.status(500).json({
@@ -67,6 +67,40 @@ router.put("/update", auth, (req, res) => {
         if (password !== "") {
             stmt = "UPDATE user SET first_name = ?, last_name = ?, phonenumber = ?, password = ? WHERE email = ?";
             execute = [first_name, last_name, phonenumber, password, req.auth.email];
+        }
+
+        conn.execute(stmt, execute, function (err, results, fields) {
+            if (err) {
+                res.status(500).json({
+                    status: "error",
+                    message: `Server error : ${err}`,
+                });
+                return;
+            }
+            res.status(200).json({
+                status: "ok",
+                message: "แก้ไขข้อมูลสำเร็จ",
+            });
+        });
+    } else {
+        res.status(400).json({
+            status: "error",
+            message: "กรอกข้อมูลให้ครบถ้วน",
+        });
+        return;
+    }
+});
+
+router.put("/admin/update", auth, (req, res) => {
+    const { id, first_name, last_name, phonenumber, password } = req.body;
+    if (first_name !== "" && last_name !== "" && phonenumber !== "") {
+
+        let stmt = "UPDATE user SET first_name = ?, last_name = ?, phonenumber = ? WHERE user_id = ?";
+        let execute = [first_name, last_name, phonenumber, id];
+
+        if (password !== "") {
+            stmt = "UPDATE user SET first_name = ?, last_name = ?, phonenumber = ?, password = ? WHERE user_id = ?";
+            execute = [first_name, last_name, phonenumber, password, id];
         }
 
         conn.execute(stmt, execute, function (err, results, fields) {

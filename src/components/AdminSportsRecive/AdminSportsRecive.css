@@ -1,0 +1,10 @@
+.rdt_TableCol {
+    justify-content: center;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.rdt_TableCell {
+    justify-content: center;
+    font-size: 16px;
+}

@@ -210,8 +210,8 @@ const BookingPage = () => {
 
                     <div className="legend">
                         <div><span className="legend-box green"></span> วันจำนวนคิวว่างในการใช้บริการ</div>
-                        <div><span className="legend-box red"></span> วันจำนวนคิวเต็มในการใช้บริการ</div>
-                        <div><span className="legend-box gray"></span> วันหยุดราชการ</div>
+                        <div><span className="legend-box red"></span> วันหยุดราชการ</div>
+                        {/* <div><span className="legend-box gray"></span> วันหยุดราชการ</div> */}
                     </div>
                 </div>
 
@@ -257,7 +257,7 @@ const BookingPage = () => {
                     </div>
 
                     <button className="add-to-cart" onClick={addToCart}>ใส่ตะกร้า</button>
-                    <button className="checkoutpage" onClick={confirmBorrow}>ยืนยันการยืมอุปกรณ์</button>
+                    <button className="checkoutpage" onClick={confirmBorrow}>ยืนยันการจอง</button>
                 </div>
             </div>
         </div>

@@ -38,7 +38,7 @@ router.get("/", (req, res) => {
         ORDER BY e.sport_id DESC
     `;
 
-    conn.execute(query, [now], function(err, result, fields) {
+    conn.execute(query, [now], function (err, result, fields) {
         if (err) {
             res.status(500).json({
                 status: "error",
@@ -58,15 +58,29 @@ router.get("/", (req, res) => {
             status: item.status
         }));
 
-        res.status(200).json({ 
-            status: "ok", 
-            data: modifiedResult 
+        res.status(200).json({
+            status: "ok",
+            data: modifiedResult
         });
     });
 });
 
 router.get("/reduce", (req, res) => {
-    conn.execute("SELECT re.date, re.amount, re.note, e.name, u.email AS admin FROM reduceequipment AS re LEFT JOIN user AS u ON re.user_id = u.user_id LEFT JOIN equipment AS e ON e.sport_id = re.sport_id ORDER BY re.date DESC", [], function(err, result, fields) {
+    conn.execute("SELECT re.date, re.amount, re.note, e.name, u.email AS admin FROM reduceequipment AS re LEFT JOIN user AS u ON re.user_id = u.user_id LEFT JOIN equipment AS e ON e.sport_id = re.sport_id ORDER BY re.date DESC", [], function (err, result, fields) {
+        if (err) {
+            res.status(500).json({
+                status: "error",
+                message: `Server error : ${err}`,
+            });
+            return;
+        }
+
+        res.status(200).json({ status: "ok", data: result });
+    });
+});
+
+router.get("/recive", (req, res) => {
+    conn.execute("SELECT re.date, re.amount, re.note, e.name, u.email AS admin FROM reciveequipment AS re LEFT JOIN user AS u ON re.user_id = u.user_id LEFT JOIN equipment AS e ON e.sport_id = re.sport_id ORDER BY re.date DESC", [], function (err, result, fields) {
         if (err) {
             res.status(500).json({
                 status: "error",
@@ -81,7 +95,7 @@ router.get("/reduce", (req, res) => {
 
 router.get("/:id", (req, res) => {
     const { id } = req.params;
-    conn.execute("SELECT * FROM equipment WHERE sport_id = ?", [id], function(err, result, fields) {
+    conn.execute("SELECT * FROM equipment WHERE sport_id = ?", [id], function (err, result, fields) {
         if (err) {
             res.status(500).json({
                 status: "error",
@@ -125,8 +139,8 @@ router.post("/add", auth, upload.single("img"), (req, res) => {
             conn.execute(
                 "INSERT INTO equipment (name, quantity, img, status) VALUES (?, ?, ?, ?)",
                 [
-                    req.body.name, 
-                    req.body.quantity,
+                    req.body.name,
+                    0,
                     req.file ? req.file.filename : "",
                     true
                 ],
@@ -146,12 +160,12 @@ router.post("/add", auth, upload.single("img"), (req, res) => {
 });
 
 router.put("/edit/:id", auth, upload.single("img"), (req, res) => {
-    let stmt = "UPDATE equipment SET name = ?, quantity = ? WHERE sport_id = ?"
-    let execute = [req.body.name, req.body.quantity, req.params.id]
+    let stmt = "UPDATE equipment SET name = ? WHERE sport_id = ?"
+    let execute = [req.body.name, req.params.id]
 
     if (req.file) {
-        stmt = "UPDATE equipment SET name = ?, quantity = ?, img = ? WHERE sport_id = ?"
-        execute = [req.body.name, req.body.quantity, req.file ? req.file.filename : "", req.params.id]
+        stmt = "UPDATE equipment SET name = ?, img = ? WHERE sport_id = ?"
+        execute = [req.body.name, req.file ? req.file.filename : "", req.params.id]
     }
 
     conn.execute(
@@ -159,6 +173,7 @@ router.put("/edit/:id", auth, upload.single("img"), (req, res) => {
         execute,
         function (err, results, fields) {
             if (err) {
+                console.log(err);
                 res.status(400).json({
                     status: "error",
                     message: err,
@@ -229,6 +244,62 @@ router.put("/reduce/:id", auth, (req, res) => {
                     message: "จำนวนอุปกรณ์มีน้อยกว่าที่จะจำหน่าย",
                 });
             }
+        }
+    );
+});
+
+router.put("/recive/:id", auth, (req, res) => {
+    conn.execute(
+        "SELECT quantity FROM equipment WHERE sport_id = ?",
+        [req.params.id],
+        function (err, results, fields) {
+            if (err) {
+                return res.status(500).json({
+                    status: "error",
+                    message: `Server error : ${err}`,
+                });
+            }
+
+            if (results.length < 1) {
+                return res.status(400).json({
+                    status: "error",
+                    message: "ไม่พบข้อมูล",
+                });
+            }
+
+            const newQuantity = parseInt(results[0].quantity) + parseInt(req.body.amount);
+
+            conn.execute(
+                "UPDATE equipment SET quantity = ? WHERE sport_id = ?",
+                [newQuantity, req.params.id],
+                function (err, results, fields) {
+                    if (err) {
+                        return res.status(500).json({
+                            status: "error",
+                            message: `Server error : ${err}`,
+                        });
+                    }
+
+                    conn.execute(
+                        `INSERT INTO reciveequipment (amount, note, sport_id, user_id) 
+                             VALUES (?, ?, ?, (SELECT user_id FROM user WHERE email = ?))`,
+                        [req.body.amount, req.body.note, req.params.id, req.auth.email],
+                        function (err, results, fields) {
+                            if (err) {
+                                return res.status(500).json({
+                                    status: "error",
+                                    message: `Server error : ${err}`,
+                                });
+                            }
+
+                            return res.status(200).json({
+                                status: "ok",
+                                message: "รับอุปกรณ์สำเร็จ",
+                            });
+                        }
+                    );
+                }
+            );
         }
     );
 });

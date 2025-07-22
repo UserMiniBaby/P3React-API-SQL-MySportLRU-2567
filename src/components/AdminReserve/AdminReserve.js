@@ -12,6 +12,9 @@ function AdminReserve() {
     const { user } = useContext(AuthContext);
     const [borrowData, setBorrowData] = useState([]);
 
+    const [searchQuery, setSearchQuery] = useState("");
+    const [filteredData, setFilteredData] = useState([]);
+
     const getBorrowData = () => {
         Axios.get("http://localhost:5000/stadiumreserve", {
             headers: {
@@ -21,6 +24,7 @@ function AdminReserve() {
             .then((resp) => {
                 if (resp.data.status === "ok") {
                     setBorrowData(resp.data.data)
+                    setFilteredData(resp.data.data);
                 }
             })
             .catch((err) => {
@@ -52,21 +56,21 @@ function AdminReserve() {
                 Authorization: "Bearer " + localStorage.getItem("token")
             }
         })
-        .then((resp) => {
-            if (resp.data.status === "ok") {
-                Swal.fire({
-                    title: 'อนุมัติเอกสารสำเร็จ',
-                    icon: 'success',
-                    confirmButtonText: 'ตกลง'
-                })
-                getBorrowData();
-            }
-        })
-        .catch((err) => {
-            if (err.response.data.message) {
-                alert(err.response.data.message)
-            }
-        });
+            .then((resp) => {
+                if (resp.data.status === "ok") {
+                    Swal.fire({
+                        title: 'อนุมัติเอกสารสำเร็จ',
+                        icon: 'success',
+                        confirmButtonText: 'ตกลง'
+                    })
+                    getBorrowData();
+                }
+            })
+            .catch((err) => {
+                if (err.response.data.message) {
+                    alert(err.response.data.message)
+                }
+            });
     }
 
     const receiveBorrow = (id) => {
@@ -75,21 +79,21 @@ function AdminReserve() {
                 Authorization: "Bearer " + localStorage.getItem("token")
             }
         })
-        .then((resp) => {
-            if (resp.data.status === "ok") {
-                Swal.fire({
-                    title: 'รับอุปกรณ์สำเร็จ',
-                    icon: 'success',
-                    confirmButtonText: 'ตกลง'
-                })
-                getBorrowData();
-            }
-        })
-        .catch((err) => {
-            if (err.response.data.message) {
-                alert(err.response.data.message)
-            }
-        });
+            .then((resp) => {
+                if (resp.data.status === "ok") {
+                    Swal.fire({
+                        title: 'รับอุปกรณ์สำเร็จ',
+                        icon: 'success',
+                        confirmButtonText: 'ตกลง'
+                    })
+                    getBorrowData();
+                }
+            })
+            .catch((err) => {
+                if (err.response.data.message) {
+                    alert(err.response.data.message)
+                }
+            });
     }
 
     const returnBorrow = (id) => {
@@ -98,21 +102,21 @@ function AdminReserve() {
                 Authorization: "Bearer " + localStorage.getItem("token")
             }
         })
-        .then((resp) => {
-            if (resp.data.status === "ok") {
-                Swal.fire({
-                    title: 'รับคืนสำเร็จ',
-                    icon: 'success',
-                    confirmButtonText: 'ตกลง'
-                })
-                getBorrowData();
-            }
-        })
-        .catch((err) => {
-            if (err.response.data.message) {
-                alert(err.response.data.message)
-            }
-        });
+            .then((resp) => {
+                if (resp.data.status === "ok") {
+                    Swal.fire({
+                        title: 'ยืนยันสำเร็จ',
+                        icon: 'success',
+                        confirmButtonText: 'ตกลง'
+                    })
+                    getBorrowData();
+                }
+            })
+            .catch((err) => {
+                if (err.response.data.message) {
+                    alert(err.response.data.message)
+                }
+            });
     }
 
     const cancelBorrow = (id) => {
@@ -121,21 +125,21 @@ function AdminReserve() {
                 Authorization: "Bearer " + localStorage.getItem("token")
             }
         })
-        .then((resp) => {
-            if (resp.data.status === "ok") {
-                Swal.fire({
-                    title: 'ยกเลิกสำเร็จ',
-                    icon: 'success',
-                    confirmButtonText: 'ตกลง'
-                })
-                getBorrowData();
-            }
-        })
-        .catch((err) => {
-            if (err.response.data.message) {
-                alert(err.response.data.message)
-            }
-        });
+            .then((resp) => {
+                if (resp.data.status === "ok") {
+                    Swal.fire({
+                        title: 'ยกเลิกสำเร็จ',
+                        icon: 'success',
+                        confirmButtonText: 'ตกลง'
+                    })
+                    getBorrowData();
+                }
+            })
+            .catch((err) => {
+                if (err.response.data.message) {
+                    alert(err.response.data.message)
+                }
+            });
     }
 
     // คอมโพเนนต์สำหรับแถวรอง
@@ -145,21 +149,21 @@ function AdminReserve() {
                 <table style={{ width: "100%", borderCollapse: "collapse" }}>
                     <thead>
                         <tr style={{ backgroundColor: "#e0e0e0" }}>
+                            <th style={{ padding: "8px", border: "1px solid #ddd" }}>พื้นที่</th>
                             <th style={{ padding: "8px", border: "1px solid #ddd" }}>วันที่ยืม</th>
                             <th style={{ padding: "8px", border: "1px solid #ddd" }}>วันที่คืน</th>
-                            <th style={{ padding: "8px", border: "1px solid #ddd" }}>พื้นที่</th>
                         </tr>
                     </thead>
                     <tbody>
                         {data.items.map((item, index) => (
                             <tr key={index} style={{ border: "1px solid #ddd" }}>
+                                <td style={{ padding: "8px", border: "1px solid #ddd" }}>{item.name}</td>
                                 <td style={{ padding: "8px", border: "1px solid #ddd" }}>
                                     {formattedDateTime(item.reserve_date)}
                                 </td>
                                 <td style={{ padding: "8px", border: "1px solid #ddd" }}>
                                     {formattedDateTime(item.reserve_end)}
                                 </td>
-                                <td style={{ padding: "8px", border: "1px solid #ddd" }}>{item.name}</td>
                             </tr>
                         ))}
                     </tbody>
@@ -173,11 +177,13 @@ function AdminReserve() {
     const columns = [
         {
             name: "เอกสารการจอง",
-            selector: () => "#XXXX",
+            selector: (row) => row.sdocument_id,
         },
         {
             name: "วันที่ยืม",
             selector: (row) => formattedDateTime(row.start),
+            id: "start", // เพิ่ม ID สำหรับคอลัมน์วันที่ยืม
+            sortable: true, // เปิดใช้งานการเรียงลำดับ
         },
         {
             name: "วันที่คืน",
@@ -214,6 +220,13 @@ function AdminReserve() {
     ];
 
     useEffect(() => {
+        const filtered = borrowData.filter((data) =>
+            String(data.sdocument_id).includes(searchQuery.toLowerCase())
+        );
+        setFilteredData(filtered);
+    }, [searchQuery, borrowData]);
+
+    useEffect(() => {
         getBorrowData()
     }, [])
 
@@ -229,14 +242,24 @@ function AdminReserve() {
         <>
             <div className="d-flex justify-content-between">
                 <h4 className="fw-bold">จัดการข้อมูลการจอง</h4>
+                <div><input
+                    type="text"
+                    className="form-control"
+                    placeholder="ค้นหาเอกสารการจอง"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    style={{ width: "300px" }}
+                /></div>
             </div>
             <hr />
             <DataTable
                 columns={columns}
-                data={borrowData}
+                data={filteredData}
                 pagination
                 expandableRows
                 expandableRowsComponent={ExpandedComponent}
+                defaultSortFieldId="start"
+                defaultSortAsc={false}
             />
 
         </>

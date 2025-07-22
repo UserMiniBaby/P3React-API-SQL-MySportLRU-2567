@@ -1,16 +1,16 @@
 import React, { useContext, useEffect, useState } from "react";
-import "./AdminSportsReduce.css";
+import "./AdminSportsRecive.css";
 import DataTable from "react-data-table-component";
 import Axios from "axios";
 import Swal from 'sweetalert2'
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 
-function AdminSportsReduce() {
+function AdminSportsRecive() {
 
     const navigate = useNavigate();
     const { user } = useContext(AuthContext);
-    const [reduceData, setReduceData] = useState([]);
+    const [reciveData, setReciveData] = useState([]);
 
     const [searchQuery, setSearchQuery] = useState("");
     const [filteredData, setFilteredData] = useState([]);
@@ -22,12 +22,12 @@ function AdminSportsReduce() {
         return localDate.toLocaleString("th-TH", { timeZone: "Asia/Bangkok" })
     }
 
-    const getReduceData = () => {
-        Axios.get("http://localhost:5000/sportequipment/reduce")
+    const getReciveData = () => {
+        Axios.get("http://localhost:5000/sportequipment/recive")
             .then((resp) => {
                 if (resp.data.status === "ok") {
                     console.log(resp.data.data)
-                    setReduceData(resp.data.data)
+                    setReciveData(resp.data.data)
                     setFilteredData(resp.data.data);
                 }
             })
@@ -74,17 +74,17 @@ function AdminSportsReduce() {
     ];
 
     useEffect(() => {
-        const filtered = reduceData.filter((data) =>
+        const filtered = reciveData.filter((data) =>
             data.admin.toLowerCase().includes(searchQuery.toLowerCase()) ||
             data.note.toLowerCase().includes(searchQuery.toLowerCase()) ||
             data.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
             data.date.toLowerCase().includes(searchQuery.toLowerCase())
         );
         setFilteredData(filtered);
-    }, [searchQuery, reduceData]);
+    }, [searchQuery, reciveData]);
 
     useEffect(() => {
-        getReduceData()
+        getReciveData()
     }, [])
 
     if (!user) return null;
@@ -98,7 +98,7 @@ function AdminSportsReduce() {
     return (
         <>
             <div className="d-flex justify-content-between">
-                <h4 className="fw-bold">การจำหน่ายอุปกรณ์</h4>
+                <h4 className="fw-bold">การรับอุปกรณ์</h4>
                 <div>
                     <input
                         type="text"
@@ -116,4 +116,4 @@ function AdminSportsReduce() {
     );
 }
 
-export default AdminSportsReduce;
+export default AdminSportsRecive;

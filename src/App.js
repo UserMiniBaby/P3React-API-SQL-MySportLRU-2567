@@ -21,6 +21,7 @@ import AdminBorrow from "./components/AdminBorrow/AdminBorrow";
 import AdminUsers from "./components/AdminUsers/AdminUsers";
 import AdminReserve from "./components/AdminReserve/AdminReserve";
 import AdminSportsReduce from "./components/AdminSportsReduce/AdminSportsReduce";
+import AdminSportsRecive from "./components/AdminSportsRecive/AdminSportsRecive";
 
 
 
@@ -50,6 +51,7 @@ function App() {
             <Route path="/dashboard/sportborrow" element={<AdminBorrow />} />
             <Route path="/dashboard/stadiumreserve" element={<AdminReserve />} />
             <Route path="/dashboard/users" element={<AdminUsers />} />
+            <Route path="/dashboard/sportrecive" element={<AdminSportsRecive />} />
           </Route>
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />

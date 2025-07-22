@@ -15,6 +15,8 @@ const ConfirmBorrowPage = () => {
         phonenumber: "",
         email: ""
     });
+    const [objective, setObjective] = useState("");
+    const [agency, setAgency] = useState("");
 
     const [cart, setCart] = useState([]);
 
@@ -41,14 +43,49 @@ const ConfirmBorrowPage = () => {
         setCart(storedCart);
     }, []);
 
+    const allDatesAreEqual = (cart) => {
+        if (cart.length < 2) return true; // น้อยกว่า 2 ไม่ต้องเช็ค
+
+        const normalize = (dates) => dates.map(d => d.trim()).sort(); // จัดเรียงก่อนเปรียบเทียบ
+        const base = normalize(cart[0].selectedDates);
+
+        return cart.every(item => {
+            const current = normalize(item.selectedDates);
+            return JSON.stringify(current) === JSON.stringify(base);
+        });
+    };
+
+
     // ✅ ฟังก์ชันยืนยันการยืม
     const handleConfirm = () => {
+        if (objective == "" && agency == "") {
+            Swal.fire({
+                title: "แจ้งเตือน",
+                text: "กรอกข้อมูลหน่วยงานและวัตถุประสงค์ให้ครบถ้วน",
+                icon: "warning",
+                confirmButtonText: "ตกลง"
+            });
+            return;
+        }
+
+        if (cart.length > 1 && !allDatesAreEqual(cart)) {
+            Swal.fire({
+                title: "แจ้งเตือน",
+                text: "วันที่ที่เลือกในรายการไม่ตรงกัน กรุณาตรวจสอบอีกครั้ง",
+                icon: "warning",
+                confirmButtonText: "ตกลง"
+            });
+            return;
+        }
+
         Axios.post("http://localhost:5000/sportcheckout", {
             data: cart,
             firstName: user.first_name,
             lastName: user.last_name,
             email: user.email,
             phoneNumber: user.phonenumber,
+            agency: agency,
+            objective: objective
         }, {
             headers: {
                 "Authorization": "Bearer " + localStorage.getItem("token")
@@ -60,7 +97,7 @@ const ConfirmBorrowPage = () => {
                 icon: "success",
                 confirmButtonText: "ตกลง"
             });
-            
+
             localStorage.removeItem("cart"); // ✅ ล้างตะกร้าหลังยืนยัน
             navigate("/status"); // ✅ ไปยังหน้าติดตามสถานะ
         }).catch((err) => {
@@ -71,7 +108,7 @@ const ConfirmBorrowPage = () => {
                     icon: "error",
                     confirmButtonText: "ตกลง"
                 });
-            } 
+            }
 
             console.error("Error saving checkout data:", err);
         })
@@ -79,6 +116,7 @@ const ConfirmBorrowPage = () => {
 
     return (
         <div className="confirm-container">
+            <h4 className="fw-bold">ยืนยันการยืม/จอง</h4>
             <div className="confirm-content">
                 {/* ✅ ส่วนรายละเอียดบัญชี */}
                 <div className="left-section">
@@ -100,26 +138,37 @@ const ConfirmBorrowPage = () => {
                     {cart.length === 0 ? (
                         <p className="empty-cart">ไม่มีอุปกรณ์ในตะกร้า</p>
                     ) : (
-                        <table className="order-table">
-                            <thead>
-                                <tr>
-                                    <th>ชื่ออุปกรณ์</th>
-                                    <th>เวลาที่จอง</th>
-                                    <th>วันที่จอง</th>
-                                    <th>จำนวน</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {cart.map((item, index) => (
-                                    <tr key={index}>
-                                        <td>{item.itemName}</td>
-                                        <td>{item.startTime} - {item.endTime}</td>
-                                        <td>{item.selectedDates.join(", ")}</td>
-                                        <td>{item.quantity}</td> {/* ✅ แสดงจำนวน */}
+                        <>
+                            <table className="order-table">
+                                <thead>
+                                    <tr>
+                                        <th>ชื่ออุปกรณ์</th>
+                                        <th>เวลาที่จอง</th>
+                                        <th>วันที่จอง</th>
+                                        <th>จำนวน</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {cart.map((item, index) => (
+                                        <tr key={index}>
+                                            <td>{item.itemName}</td>
+                                            <td>{item.startTime} - {item.endTime}</td>
+                                            <td>{item.selectedDates.join(", ")}</td>
+                                            <td>{item.quantity}</td> {/* ✅ แสดงจำนวน */}
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+
+                            <div class="form-group w-50">
+                                <label for="agency">หน่วยงาน</label>
+                                <input type="text" class="form-control" id="agency" value={agency} onChange={(e) => setAgency(e.target.value)} />
+                            </div>
+                            <div class="form-group w-50">
+                                <label for="objective">วัตถุประสงค์</label>
+                                <textarea class="form-control" id="objective" rows="3" value={objective} onChange={(e) => setObjective(e.target.value)}></textarea>
+                            </div>
+                        </>
                     )}
                     <button className="confirm-button" onClick={handleConfirm}>ยืนยันการยืม</button>
                 </div>
